@@ -17,9 +17,30 @@ composer require protonemedia/laravel-tracer
 
 ## Usage
 
+
+Add the `QualifyRoute` middleware to your Route Middleware stack:
+
 ``` php
-// Usage description here
+class Kernel extends \Illuminate\Foundation\Http\Kernel
+{
+    protected $routeMiddleware = [
+        // ...
+        'qualify' => \Protonemedia\LaravelTracer\Middleware\QualifyRoute::class,
+        // ...
+    ];
+}
 ```
+
+Add the `TraceUser` middleware to the routes or groups you want to trace, for example in the `web.php` routes file:
+
+```php
+use Protonemedia\LaravelTracer\Middleware\TraceUser;
+
+Route::group(['middleware' => [TraceUser::class]], function () {
+    Route::get('settings', 'SettingsController')->name('settings.show');
+});
+```
+
 
 ### Testing
 
