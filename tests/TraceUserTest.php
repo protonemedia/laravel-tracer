@@ -42,7 +42,7 @@ class TraceUserTest extends AbstractTest
         });
 
         $router->get('/limit', $success)
-            ->middleware('qualify:limitted,30');
+            ->middleware('qualify:limited,30');
 
         $router->get('/custom', function (Request $request) {
             QualifyRoute::forRequest($request, 'custom-qualifier');
@@ -116,15 +116,15 @@ class TraceUserTest extends AbstractTest
     /** @test */
     public function it_can_limit_the_logs_with_a_second_optional_paramter()
     {
-        $this->assertGetRequestQualifiesAs('/limit', 'limitted');
-        $this->assertGetRequestQualifiesAs('/limit', 'limitted');
+        $this->assertGetRequestQualifiesAs('/limit', 'limited');
+        $this->assertGetRequestQualifiesAs('/limit', 'limited');
 
         $this->assertDatabaseMissing('user_requests', ['id' => 2]);
 
         Carbon::setTestNow(now()->addSeconds(35));
 
-        $this->assertGetRequestQualifiesAs('/limit', 'limitted', 2);
-        $this->assertGetRequestQualifiesAs('/limit', 'limitted');
+        $this->assertGetRequestQualifiesAs('/limit', 'limited', 2);
+        $this->assertGetRequestQualifiesAs('/limit', 'limited');
 
         $this->assertDatabaseMissing('user_requests', ['id' => 3]);
     }
