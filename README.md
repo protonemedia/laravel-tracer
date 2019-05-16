@@ -37,9 +37,42 @@ Add the `TraceUser` middleware to the routes or groups you want to trace, for ex
 use Protonemedia\LaravelTracer\Middleware\TraceUser;
 
 Route::group(['middleware' => [TraceUser::class]], function () {
+    Route::get('home', 'HomeController');
+
     Route::get('settings', 'SettingsController')->name('settings.show');
+
+    Route::get('privacy-policy', 'PrivacyPolicyController')->name('privacyPolicy.show')->middleware('qualify:terms');
+
+    Route::get('profile/notifications', 'NotificationsController')->name('notifications.index')->middleware('qualify:notifications,60');
+
+    Route::group(['middleware' => ['qualify:finance']], function () {
+        Route::get('invoices', 'InvoicesController@index')->name('invoices.index');
+        Route::get('invoices/{id}', 'InvoicesController@show')->name('invoices.show');
+    });
+
+    Route::get('machine/{id}', 'MachineController');
+    Route::get('rack/{id}', 'RackController')->middleware('qualify:rack');
+    Route::get('server/{id}', 'ServerController')->middleware('qualify:server.{id}');
 });
 ```
+
+As you can see there are some example routes added to the group of routes we want to trace. Let's explain how each route will be qualified.
+
+A GET request to `/home` will simply be qualified as `home` since it has no name and no qualifier.
+
+A GET request to `/settings` will be qualified as `settings.show` because it has a name but still no qualifier.
+
+A GET request to `/privacy-policy` will be qualified as `terms`, this has been accomplished with the `qualify` middleware.
+
+A GET request to `/profile/notifications` will be qualified as `notifications` and as you can see, the `qualify` middleware was given a second parameter. This is the number of seconds between each log of this qualifier. When a user visits this route more than once in 60 seconds, it will be stored as 1 request.
+
+A GET request to both `/invoices` and `/invoices/1` will be qualified as `finance`.
+
+A GET request `/machine/1` will be qualified as `machine/1`.
+
+A GET request to both `/rack/1` and `/rack/2` will be qualified as `rack`.
+
+A GET request to `/server/1` will be qualified as `server.1`.
 
 
 ### Testing
