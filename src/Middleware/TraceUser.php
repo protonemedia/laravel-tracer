@@ -8,12 +8,22 @@ use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
-use Protonemedia\LaravelTracer\Middleware\QualifyRoute;
 use Protonemedia\LaravelTracer\UserRequest;
-use Symfony\Component\HttpFoundation\Response;
 
 class TraceUser
 {
+    private $limiter;
+
+    /**
+     * Sets the Rate Limiter.
+     *
+     * @param \Illuminate\Cache\RateLimiter $limiter
+     */
+    public function __construct(RateLimiter $limiter)
+    {
+        $this->limiter = $limiter;
+    }
+
     /**
      * Handle an incoming request and trace the user
      * if the current user is authenticated.
@@ -26,22 +36,17 @@ class TraceUser
     {
         $response = $next($request);
 
-        if (($user = $request->user()) && $this->isSuccessful($response)) {
-            $this->traceUserRequest($user, $request);
+        if (!$user = $request->user()) {
+            return $response;
         }
 
-        return $response;
-    }
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            return $response;
+        }
 
-    /**
-     * Returns a boolean wether the response is successful.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Response $response
-     * @return bool
-     */
-    private function isSuccessful(Response $response): bool
-    {
-        return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
+        $this->traceUserRequest($user, $request);
+
+        return $response;
     }
 
     /**
@@ -52,72 +57,62 @@ class TraceUser
      *
      * @return \Protonemedia\LaravelTracer\UserRequest|null
      */
-    public function traceUserRequest(UserContract $user, Request $request)
+    public function traceUserRequest(UserContract $user, Request $request):  ? UserRequest
     {
-        $qualifiedRoute = $this->qualify(
-            $this->gatherRequestData($request, $request->route())
-        );
+        $qualified = $this->qualify($request, $request->route());
 
-        if ($qualifiedRoute['seconds']) {
-            $limiter = app(RateLimiter::class);
-
-            if ($limiter->tooManyAttempts($qualifiedRoute['name'], 1)) {
-                return;
-            }
-
-            $limiter->hit($qualifiedRoute['name'], $qualifiedRoute['seconds']);
+        if ($this->tooManyAttempts($qualified)) {
+            return null;
         }
 
         return UserRequest::create([
             'user_id'         => $user->getAuthIdentifier(),
-            'qualified_route' => $qualifiedRoute['name'],
+            'qualified_route' => $qualified['name'],
         ]);
-    }
-
-    /**
-     * Returns an array of relevant request and route data.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Illuminate\Routing\Route   $route
-     * @return array
-     */
-    private function gatherRequestData(Request $request, Route $route): array
-    {
-        return [
-            'method'     => $request->method(),
-            'path'       => $request->path(),
-            'name'       => $route->getName(),
-            'uses'       => $route->getAction()['uses'],
-            'parameters' => $route->parameters(),
-            'uri'        => $route->uri(),
-        ];
     }
 
     /**
      * Returns the qualified name for the given request and route data.
      *
-     * @param  array  $data
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Routing\Route   $route
      * @return mixed
      */
-    private function qualify(array $data): array
+    private function qualify(Request $request, Route $route) : array
     {
-        $routes = QualifyRoute::$qualifiedRoutes;
-
-        if (!array_key_exists($data['uri'], $routes)) {
+        if (!$qualified = QualifyRoute::getByUri($route->uri())) {
             return [
-                'name'    => $data['name'] ?: $data['path'],
-                'seconds' => null,
+                'name'                 => $route->getName() ?: $request->path(),
+                'seconds_between_logs' => null,
             ];
         }
 
-        $qualified = $routes[$data['uri']];
-
-        Collection::make($data['parameters'])->map(function ($value, $parameter) use (&$qualified) {
+        Collection::make($route->parameters())->map(function ($value, $parameter) use (&$qualified) {
             $qualified['name'] = str_replace("{{$parameter}}", $value, $qualified['name']);
         });
 
-        $qualified['seconds'] = $qualified['seconds'] ?? null;
-
         return $qualified;
+    }
+
+    /**
+     * Returns a boolean wether this request has been attemped to
+     * trace too many times.
+     *
+     * @param  array  $qualified
+     * @return boolean
+     */
+    private function tooManyAttempts(array $qualified): bool
+    {
+        if (!$qualified['seconds_between_logs']) {
+            return false;
+        }
+
+        if ($this->limiter->tooManyAttempts($qualified['name'], 1)) {
+            return true;
+        }
+
+        $this->limiter->hit($qualified['name'], $qualified['seconds_between_logs']);
+
+        return false;
     }
 }

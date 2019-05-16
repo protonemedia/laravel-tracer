@@ -3,14 +3,23 @@
 namespace Protonemedia\LaravelTracer\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 
 class QualifyRoute
 {
-    public static $qualifiedRoutes = [];
+    private static $qualifiedRoutes = [];
 
-    public static function forRequest($request, $name, int $seconds = null)
+    public static function forRequest(Request $request, string $name, int $secondsBetweenLogs = null)
     {
-        static::$qualifiedRoutes[$request->route()->uri()] = compact('name', 'seconds');
+        static::$qualifiedRoutes[$request->route()->uri()] = [
+            'name'                 => $name,
+            'seconds_between_logs' => $secondsBetweenLogs,
+        ];
+    }
+
+    public static function getByUri(string $uri):  ? array
+    {
+        return static::$qualifiedRoutes[$uri] ?? null;
     }
 
     /**
