@@ -17,7 +17,6 @@ composer require protonemedia/laravel-tracer
 
 ## Usage
 
-
 Add the `QualifyRoute` middleware to your Route Middleware stack:
 
 ``` php
@@ -56,15 +55,19 @@ Route::group(['middleware' => [TraceUser::class]], function () {
 });
 ```
 
+### Qualify routes
+
 As you can see there are some example routes added to the group of routes we want to trace. Let's explain how each route will be qualified.
 
-A GET request to `/home` will simply be qualified as `home` since it has no name and no qualifier.
+* A GET request to `/home` will simply be qualified as `home` since it has no name and no qualifier.
+* A GET request to `/settings` will be qualified as `settings.show` because it has a name but still no qualifier.
+* A GET request to `/privacy-policy` will be qualified as `terms`, this has been accomplished with the `qualify` middleware.
 
-A GET request to `/settings` will be qualified as `settings.show` because it has a name but still no qualifier.
-
-A GET request to `/privacy-policy` will be qualified as `terms`, this has been accomplished with the `qualify` middleware.
+### Rate limiting
 
 A GET request to `/profile/notifications` will be qualified as `notifications` and as you can see, the `qualify` middleware was given a second parameter. This is the number of seconds between each log of this qualifier. When a user visits this route more than once in 60 seconds, it will be stored as 1 request.
+
+### Grouped qualifiers
 
 A GET request to both `/invoices` and `/invoices/1` will be qualified as `finance`.
 
