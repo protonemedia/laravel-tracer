@@ -7,8 +7,22 @@ use Illuminate\Http\Request;
 
 class QualifyRoute
 {
+    /**
+     * Array holding the qualified routes.
+     *
+     * @var array
+     */
     private static $qualifiedRoutes = [];
 
+    /**
+     * Set the qualified name and limit interval for the given request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string   $name
+     * @param  int|null $secondsBetweenLogs
+     *
+     * @return void
+     */
     public static function forRequest(Request $request, string $name, int $secondsBetweenLogs = null)
     {
         static::$qualifiedRoutes[$request->route()->uri()] = [
@@ -17,6 +31,12 @@ class QualifyRoute
         ];
     }
 
+    /**
+     * Returns the qualified data for the given uri.
+     *
+     * @param  string $uri
+     * @return array
+     */
     public static function getByUri(string $uri):  ? array
     {
         return static::$qualifiedRoutes[$uri] ?? null;

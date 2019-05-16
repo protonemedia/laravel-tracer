@@ -12,6 +12,11 @@ use Protonemedia\LaravelTracer\UserRequest;
 
 class TraceUser
 {
+    /**
+     * Rate Limiter
+     *
+     * @var \Illuminate\Cache\RateLimiter
+     */
     private $limiter;
 
     /**
