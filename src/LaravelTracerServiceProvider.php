@@ -11,12 +11,16 @@ class LaravelTracerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/config.php' => config_path('laravel-tracer.php'),
             ], 'config');
+
+            if (!class_exists('CreateUserRequestsTable')) {
+                $this->publishes([
+                    __DIR__ . '/../database/migrations/create_user_requests_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_user_requests_table.php'),
+                ], 'migrations');
+            }
         }
     }
 

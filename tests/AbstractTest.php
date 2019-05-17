@@ -11,7 +11,8 @@ abstract class AbstractTest extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+        include_once __DIR__ . '/../database/migrations/create_user_requests_table.php.stub';
+        (new \CreateUserRequestsTable)->up();
 
         $this->app['router']->group(['middleware' => TraceUser::class], function ($router) {
             $this->setupRoutes($router);

@@ -18,6 +18,11 @@ class CreateUserRequestsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('qualified_route');
             $table->timestamp('created_at')->nullable();
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 
