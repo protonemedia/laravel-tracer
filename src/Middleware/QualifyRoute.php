@@ -19,11 +19,11 @@ class QualifyRoute
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string   $name
-     * @param  int|null $secondsBetweenLogs
+     * @param  bool|int $secondsBetweenLogs
      *
      * @return void
      */
-    public static function forRequest(Request $request, string $name, int $secondsBetweenLogs = null)
+    public static function forRequest(Request $request, string $name, $secondsBetweenLogs = null)
     {
         static::$qualifiedRoutes[$request->route()->uri()] = [
             'name'                 => $name,
@@ -49,10 +49,10 @@ class QualifyRoute
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string  $name
-     * @param  int  $seconds
+     * @param  bool|int  $seconds
      * @return mixed
      */
-    public function handle($request, Closure $next, $name, int $seconds = null)
+    public function handle($request, Closure $next, $name, $seconds = null)
     {
         static::forRequest($request, $name, $seconds);
 

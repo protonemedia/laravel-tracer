@@ -134,4 +134,28 @@ class TraceUserTest extends AbstractTest
     {
         $this->assertGetRequestQualifiesAs('/custom', 'custom-qualifier');
     }
+
+    /** @test */
+    public function it_can_have_a_default_limiter()
+    {
+        config(['laravel-tracer.seconds_between_logs' => 60]);
+
+        $this->assertGetRequestQualifiesAs('/route-without-name', 'route-without-name');
+        $this->assertGetRequestQualifiesAs('/route-without-name', 'route-without-name');
+
+        $this->assertDatabaseMissing('user_requests', ['id' => 2]);
+    }
+
+    /** @test */
+    public function it_can_have_an_additional_callback_to_see_if_should_be_traced()
+    {
+        config(['laravel-tracer.should_trace_user' => 'Protonemedia\LaravelTracer\Tests\ShouldTrace@no']);
+
+        $this->makeGetRequest('/route-without-name');
+        $this->assertDatabaseMissing('user_requests', ['id' => 1]);
+
+        config(['laravel-tracer.should_trace_user' => 'Protonemedia\LaravelTracer\Tests\ShouldTrace@yes']);
+
+        $this->assertGetRequestQualifiesAs('/route-without-name', 'route-without-name');
+    }
 }

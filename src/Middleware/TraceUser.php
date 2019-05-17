@@ -7,8 +7,10 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Protonemedia\LaravelTracer\UserRequest;
+use Symfony\Component\HttpFoundation\Response;
 
 class TraceUser
 {
@@ -49,7 +51,7 @@ class TraceUser
             return $response;
         }
 
-        $this->traceUserRequest($user, $request);
+        $this->traceUserRequest($user, $request, $response);
 
         return $response;
     }
@@ -59,14 +61,19 @@ class TraceUser
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
      *
      * @return \Protonemedia\LaravelTracer\UserRequest|null
      */
-    public function traceUserRequest(UserContract $user, Request $request):  ? UserRequest
+    private function traceUserRequest(UserContract $user, Request $request, Response $response):  ? UserRequest
     {
         $qualified = $this->qualify($request, $request->route());
 
         if ($this->tooManyAttempts($qualified)) {
+            return null;
+        }
+
+        if (!$this->shouldTraceUser($request, $response)) {
             return null;
         }
 
@@ -108,6 +115,10 @@ class TraceUser
      */
     private function tooManyAttempts(array $qualified): bool
     {
+        if (is_null($qualified['seconds_between_logs'])) {
+            $qualified['seconds_between_logs'] = config('laravel-tracer.seconds_between_logs');
+        }
+
         if (!$qualified['seconds_between_logs']) {
             return false;
         }
@@ -119,5 +130,14 @@ class TraceUser
         $this->limiter->hit($qualified['name'], $qualified['seconds_between_logs']);
 
         return false;
+    }
+
+    private function shouldTraceUser(Request $request, Response $response): bool
+    {
+        if (!$callable = config('laravel-tracer.should_trace_user')) {
+            return true;
+        }
+
+        return app()->call($callable, [$request, $response]);
     }
 }

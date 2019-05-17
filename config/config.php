@@ -1,8 +1,9 @@
 <?php
 
-/*
- * You can place your custom package configuration in here.
- */
 return [
+
+    'seconds_between_logs' => null,
+
+    'should_trace_user' => null,
 
 ];
