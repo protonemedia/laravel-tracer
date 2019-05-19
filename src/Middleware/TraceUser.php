@@ -6,9 +6,8 @@ use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Protonemedia\LaravelTracer\QualifiedRoute;
 use Protonemedia\LaravelTracer\UserRequest;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -67,7 +66,7 @@ class TraceUser
      */
     private function traceUserRequest(UserContract $user, Request $request, Response $response):  ? UserRequest
     {
-        $qualified = $this->qualify($request, $request->route());
+        $qualified = $request->qualifiedRoute();
 
         if ($this->tooManyAttempts($qualified)) {
             return null;
@@ -79,31 +78,8 @@ class TraceUser
 
         return UserRequest::create([
             'user_id'         => $user->getAuthIdentifier(),
-            'qualified_route' => $qualified['name'],
+            'qualified_route' => $qualified->name(),
         ]);
-    }
-
-    /**
-     * Returns the qualified name for the given request and route data.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Routing\Route   $route
-     * @return mixed
-     */
-    private function qualify(Request $request, Route $route) : array
-    {
-        if (!$qualified = QualifyRoute::getByUri($route->uri())) {
-            return [
-                'name'                 => $route->getName() ?: $request->path(),
-                'seconds_between_logs' => null,
-            ];
-        }
-
-        Collection::make($route->parameters())->map(function ($value, $parameter) use (&$qualified) {
-            $qualified['name'] = str_replace("{{$parameter}}", $value, $qualified['name']);
-        });
-
-        return $qualified;
     }
 
     /**
@@ -113,25 +89,29 @@ class TraceUser
      * @param  array  $qualified
      * @return boolean
      */
-    private function tooManyAttempts(array $qualified): bool
+    private function tooManyAttempts($qualified) : bool
     {
-        if (is_null($qualified['seconds_between_logs'])) {
-            $qualified['seconds_between_logs'] = config('laravel-tracer.seconds_between_logs');
-        }
-
-        if (!$qualified['seconds_between_logs']) {
+        if (!$secondsBetweenLogs = $qualified->secondsBetweenLogs()) {
             return false;
         }
 
-        if ($this->limiter->tooManyAttempts($qualified['name'], 1)) {
+        if ($this->limiter->tooManyAttempts($qualified->name(), 1)) {
             return true;
         }
 
-        $this->limiter->hit($qualified['name'], $qualified['seconds_between_logs']);
+        $this->limiter->hit($qualified->name(), $secondsBetweenLogs);
 
         return false;
     }
 
+    /**
+     * Calls the callable method that can be specified in the config file.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Symfony\Component\HttpFoundation\Response $response
+     *
+     * @return boolean
+     */
     private function shouldTraceUser(Request $request, Response $response): bool
     {
         if (!$callable = config('laravel-tracer.should_trace_user')) {

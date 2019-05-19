@@ -2,7 +2,10 @@
 
 namespace Protonemedia\LaravelTracer;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Protonemedia\LaravelTracer\QualifiedRoute;
 
 class LaravelTracerServiceProvider extends ServiceProvider
 {
@@ -29,7 +32,16 @@ class LaravelTracerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'laravel-tracer');
+
+        // setter for the qualified route
+        Request::macro('qualifyRoute', function (string $name, $secondsBetweenLogs = null) {
+            $this->qualifiedRoute = new QualifiedRoute($this->route(), $name, $secondsBetweenLogs);
+        });
+
+        // getter for the qualified route
+        Request::macro('qualifiedRoute', function () {
+            return $this->qualifiedRoute ?: QualifiedRoute::fromRequest($this);
+        });
     }
 }

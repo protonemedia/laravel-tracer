@@ -45,7 +45,7 @@ class TraceUserTest extends AbstractTest
             ->middleware('qualify:limited,30');
 
         $router->get('/custom', function (Request $request) {
-            QualifyRoute::forRequest($request, 'custom-qualifier');
+            $request->qualifyRoute('custom-qualifier');
             return [];
         });
     }
