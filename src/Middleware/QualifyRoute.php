@@ -4,8 +4,6 @@ namespace Protonemedia\LaravelTracer\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Protonemedia\LaravelTracer\QualifiedRoute;
 
 class QualifyRoute
 {
