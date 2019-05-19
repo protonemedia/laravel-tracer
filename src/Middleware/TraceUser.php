@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Protonemedia\LaravelTracer\QualifiedRoute;
 use Protonemedia\LaravelTracer\UserRequest;
 use Symfony\Component\HttpFoundation\Response;
@@ -86,10 +85,10 @@ class TraceUser
      * Returns a boolean wether this request has been attemped to
      * trace too many times.
      *
-     * @param  array  $qualified
+     * @param  \Protonemedia\LaravelTracer\QualifiedRoute  $qualified
      * @return boolean
      */
-    private function tooManyAttempts($qualified) : bool
+    private function tooManyAttempts(QualifiedRoute $qualified) : bool
     {
         if (!$secondsBetweenLogs = $qualified->secondsBetweenLogs()) {
             return false;

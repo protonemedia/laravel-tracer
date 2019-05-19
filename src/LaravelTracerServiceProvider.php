@@ -40,7 +40,7 @@ class LaravelTracerServiceProvider extends ServiceProvider
         });
 
         // getter for the qualified route
-        Request::macro('qualifiedRoute', function () {
+        Request::macro('qualifiedRoute', function (): QualifiedRoute {
             return $this->qualifiedRoute ?: QualifiedRoute::fromRequest($this);
         });
     }
