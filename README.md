@@ -108,7 +108,30 @@ class TicketsController extends Controller
 
 ### Config
 
-The config file consists of only two options. The first option is `seconds_between_logs` which can be used to set a default for the Rate Limiter. The second option is `should_trace_user` where you can specify a class@method which should return a boolean that specifies wether to trace or not. It takes two parameters: $request and $response.
+The config file consists of only two options. The first option is `seconds_between_logs` which can be used to set a default for the Rate Limiter. The second option is `should_trace_user` where you can specify a class@method which should return a boolean that specifies wether to trace or not. It takes two parameters: $request and $response:
+
+```php
+
+// config/laravel-tracer.php:
+return [
+    'seconds_between_logs' => 120,
+
+    'should_trace_user' => 'MyClass@shouldTrace',
+];
+
+// MyClass.php
+
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class MyClass
+{
+    public function shouldTrace(Request $request, Response $response): bool
+    {
+        return !$request->user()->isAdmin();
+    }
+}
+```
 
 ### Testing
 
