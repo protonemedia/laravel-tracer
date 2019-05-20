@@ -4,7 +4,6 @@ namespace Protonemedia\LaravelTracer\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Protonemedia\LaravelTracer\Middleware\QualifyRoute;
 
 class TraceUserTest extends AbstractTest
 {
@@ -45,7 +44,7 @@ class TraceUserTest extends AbstractTest
             ->middleware('qualify:limited,30');
 
         $router->get('/custom', function (Request $request) {
-            $request->qualifyRoute('custom-qualifier');
+            $request->qualifyAs('custom-qualifier');
             return [];
         });
     }

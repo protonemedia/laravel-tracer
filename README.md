@@ -1,11 +1,11 @@
-# Very short description of the package
+# Laravel Tracer
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/protonemedia/laravel-tracer.svg?style=flat-square)](https://packagist.org/packages/protonemedia/laravel-tracer)
 [![Build Status](https://img.shields.io/travis/pascalbaljetmedia/laravel-tracer/master.svg?style=flat-square)](https://travis-ci.org/pascalbaljetmedia/laravel-tracer)
 [![Quality Score](https://img.shields.io/scrutinizer/g/pascalbaljetmedia/laravel-tracer.svg?style=flat-square)](https://scrutinizer-ci.com/g/pascalbaljetmedia/laravel-tracer)
 [![Total Downloads](https://img.shields.io/packagist/dt/protonemedia/laravel-tracer.svg?style=flat-square)](https://packagist.org/packages/protonemedia/laravel-tracer)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+
 
 ## Installation
 
@@ -65,18 +65,50 @@ As you can see there are some example routes added to the group of routes we wan
 
 ### Rate limiting
 
-A GET request to `/profile/notifications` will be qualified as `notifications` and as you can see, the `qualify` middleware was given a second parameter. This is the number of seconds between each log of this qualifier. When a user visits this route more than once in 60 seconds, it will be stored as 1 request.
+* A GET request to `/profile/notifications` will be qualified as `notifications` and as you can see, the `qualify` middleware was given a second parameter. This is the number of seconds between each log of this qualifier. When a user visits this route more than once in 60 seconds, it will be stored as 1 request.
 
 ### Grouped qualifiers
 
-A GET request to both `/invoices` and `/invoices/1` will be qualified as `finance`.
+* A GET request to both `/invoices` and `/invoices/1` will be qualified as `finance`.
 
-A GET request `/machine/1` will be qualified as `machine/1`.
+### Parameters
 
-A GET request to both `/rack/1` and `/rack/2` will be qualified as `rack`.
+* A GET request `/machine/1` will be qualified as `machine/1`, it has no name and no qualifier so the `path` will be used as qualifier.
+* A GET request to both `/rack/1` and `/rack/2` will be qualified as `rack`. Though the route has a parameter, the qualifier will be used.
+* A GET request to `/server/1` will be qualified as `server.1`. The parameter in the qualifier will be replaced with the actual value used in the path.
 
-A GET request to `/server/1` will be qualified as `server.1`.
+### Qualify from the controller
 
+This package adds two macros to `Illuminate\Http\Request`. The first one is `qualifyAs`. Just as the `QualifyRoute` middleware this method takes two parameters. The first parameter is the name and the second paramater (optional) is the number seconds to be used by the Rate Limiter. From your controller you could qualify the route using the `Request` object or by using the `request()` helper method. The other macro is `qualifiedRoute` which is a getter for the `QualifiedRoute` instance.
+
+```php
+use Illuminate\Http\Request;
+
+class TicketsController extends Controller
+{
+    public function index()
+    {
+        request()->qualifyAs('tickets', 60);
+    }
+
+    public function show(Request $request, $id)
+    {
+        $request->qualifyAs('tickets');
+    }
+
+    public function delete(Request $request, $id)
+    {
+        $qualifiedRoute = $request->qualifiedRoute();
+
+        $qualifiedRoute->name();
+        $qualifiedRoute->secondsBetweenLogs();
+    }
+}
+```
+
+### Config
+
+The config file consists of only two options. The first option is `seconds_between_logs` which can be used to set a default for the Rate Limiter. The second option is `should_trace_user` where you can specify a class@method which should return a boolean that specifies wether to trace or not. It takes two parameters: $request and $response.
 
 ### Testing
 

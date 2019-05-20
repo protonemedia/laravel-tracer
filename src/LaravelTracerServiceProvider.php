@@ -33,7 +33,7 @@ class LaravelTracerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'laravel-tracer');
 
         // setter for the qualified route
-        Request::macro('qualifyRoute', function (string $name, $secondsBetweenLogs = null) {
+        Request::macro('qualifyAs', function (string $name, $secondsBetweenLogs = null) {
             $this->qualifiedRoute = new QualifiedRoute($this->route(), $name, $secondsBetweenLogs);
         });
 

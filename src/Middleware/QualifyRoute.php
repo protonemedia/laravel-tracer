@@ -18,7 +18,7 @@ class QualifyRoute
      */
     public function handle(Request $request, Closure $next, $name, $secondsBetweenLogs = null)
     {
-        $request->qualifyRoute($name, $secondsBetweenLogs);
+        $request->qualifyAs($name, $secondsBetweenLogs);
 
         return $next($request);
     }
