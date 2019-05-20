@@ -5,7 +5,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/pascalbaljetmedia/laravel-tracer.svg?style=flat-square)](https://scrutinizer-ci.com/g/pascalbaljetmedia/laravel-tracer)
 [![Total Downloads](https://img.shields.io/packagist/dt/protonemedia/laravel-tracer.svg?style=flat-square)](https://packagist.org/packages/protonemedia/laravel-tracer)
 
-
+A package to log request of authenticated users by bundling and qualifying routes.
 
 ## Installation
 
@@ -13,6 +13,13 @@ You can install the package via composer:
 
 ```bash
 composer require protonemedia/laravel-tracer
+```
+
+Publish the migration and config file and then run the migration.
+
+```bash
+php artisan vendor:publish
+php artisan migrate
 ```
 
 ## Usage
@@ -54,6 +61,8 @@ Route::group(['middleware' => [TraceUser::class]], function () {
     Route::get('server/{id}', 'ServerController')->middleware('qualify:server.{id}');
 });
 ```
+
+Now every request in this example will be logged to the `user_requests` table. You can use the `Protonemedia\LaravelTracer\UserRequest` model the retrieve the log entries.
 
 ### Qualify routes
 
