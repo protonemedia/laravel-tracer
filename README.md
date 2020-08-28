@@ -1,8 +1,9 @@
-# Laravel Tracer
+# [WIP] Laravel Tracer
+## Do not use in production!
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/protonemedia/laravel-tracer.svg?style=flat-square)](https://packagist.org/packages/protonemedia/laravel-tracer)
-[![Build Status](https://img.shields.io/travis/pascalbaljetmedia/laravel-tracer/master.svg?style=flat-square)](https://travis-ci.org/pascalbaljetmedia/laravel-tracer)
-[![Quality Score](https://img.shields.io/scrutinizer/g/pascalbaljetmedia/laravel-tracer.svg?style=flat-square)](https://scrutinizer-ci.com/g/pascalbaljetmedia/laravel-tracer)
+[![Build Status](https://img.shields.io/travis/protonemedia/laravel-tracer/master.svg?style=flat-square)](https://travis-ci.org/protonemedia/laravel-tracer)
+[![Quality Score](https://img.shields.io/scrutinizer/g/protonemedia/laravel-tracer.svg?style=flat-square)](https://scrutinizer-ci.com/g/protonemedia/laravel-tracer)
 [![Total Downloads](https://img.shields.io/packagist/dt/protonemedia/laravel-tracer.svg?style=flat-square)](https://packagist.org/packages/protonemedia/laravel-tracer)
 
 A package to log request of authenticated users by bundling and qualifying routes.
