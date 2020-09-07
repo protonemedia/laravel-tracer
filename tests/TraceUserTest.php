@@ -1,6 +1,6 @@
 <?php
 
-namespace Protonemedia\LaravelTracer\Tests;
+namespace ProtoneMedia\LaravelTracer\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -148,12 +148,12 @@ class TraceUserTest extends AbstractTest
     /** @test */
     public function it_can_have_an_additional_callback_to_see_if_should_be_traced()
     {
-        config(['laravel-tracer.should_trace_user' => 'Protonemedia\LaravelTracer\Tests\ShouldTrace@no']);
+        config(['laravel-tracer.should_trace_user' => 'ProtoneMedia\LaravelTracer\Tests\ShouldTrace@no']);
 
         $this->makeGetRequest('/route-without-name');
         $this->assertDatabaseMissing('user_requests', ['id' => 1]);
 
-        config(['laravel-tracer.should_trace_user' => 'Protonemedia\LaravelTracer\Tests\ShouldTrace@yes']);
+        config(['laravel-tracer.should_trace_user' => 'ProtoneMedia\LaravelTracer\Tests\ShouldTrace@yes']);
 
         $this->assertGetRequestQualifiesAs('/route-without-name', 'route-without-name');
     }

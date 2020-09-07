@@ -1,6 +1,6 @@
 <?php
 
-namespace Protonemedia\LaravelTracer\Middleware;
+namespace ProtoneMedia\LaravelTracer\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;

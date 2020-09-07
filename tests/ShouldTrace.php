@@ -1,6 +1,6 @@
 <?php
 
-namespace Protonemedia\LaravelTracer\Tests;
+namespace ProtoneMedia\LaravelTracer\Tests;
 
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

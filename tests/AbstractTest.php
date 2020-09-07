@@ -1,9 +1,9 @@
 <?php
 
-namespace Protonemedia\LaravelTracer\Tests;
+namespace ProtoneMedia\LaravelTracer\Tests;
 
 use Illuminate\Foundation\Auth\User;
-use Protonemedia\LaravelTracer\Middleware\TraceUser;
+use ProtoneMedia\LaravelTracer\Middleware\TraceUser;
 
 abstract class AbstractTest extends \Orchestra\Testbench\TestCase
 {
@@ -24,13 +24,13 @@ abstract class AbstractTest extends \Orchestra\Testbench\TestCase
     protected function getPackageProviders($app)
     {
         return [
-            'Protonemedia\LaravelTracer\LaravelTracerServiceProvider',
+            'ProtoneMedia\LaravelTracer\LaravelTracerServiceProvider',
         ];
     }
 
     protected function resolveApplicationHttpKernel($app)
     {
-        $app->singleton('Illuminate\Contracts\Http\Kernel', 'Protonemedia\LaravelTracer\Tests\TestHttpKernel');
+        $app->singleton('Illuminate\Contracts\Http\Kernel', 'ProtoneMedia\LaravelTracer\Tests\TestHttpKernel');
     }
 
     protected function getEnvironmentSetUp($app)

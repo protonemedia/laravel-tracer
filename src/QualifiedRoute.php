@@ -1,6 +1,6 @@
 <?php
 
-namespace Protonemedia\LaravelTracer;
+namespace ProtoneMedia\LaravelTracer;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
