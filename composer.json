@@ -5,7 +5,7 @@
         "protonemedia",
         "laravel-tracer"
     ],
-    "homepage": "https://github.com/pascalbaljetmedia/laravel-tracer",
+    "homepage": "https://github.com/protonemedia/laravel-tracer",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -17,34 +17,35 @@
     ],
     "require": {
         "php": "^7.2",
-        "illuminate/support": "5.7.* || 5.8.* || ^6.0 || ^7.0"
+        "illuminate/support": "^6.0 || ^7.0 || ^8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "3.8.* || 3.9.* || ^4.0",
-        "phpunit/phpunit": "^7.0|^8.0"
+        "orchestra/testbench": "^4.0 || ^5.0 || ^6.0",
+        "phpunit/phpunit": "^8.0"
     },
     "autoload": {
         "psr-4": {
-            "Protonemedia\\LaravelTracer\\": "src"
+            "ProtoneMedia\\LaravelTracer\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Protonemedia\\LaravelTracer\\Tests\\": "tests"
+            "ProtoneMedia\\LaravelTracer\\Tests\\": "tests"
         }
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
-
     },
     "config": {
         "sort-packages": true
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "extra": {
         "laravel": {
             "providers": [
-                "Protonemedia\\LaravelTracer\\LaravelTracerServiceProvider"
+                "ProtoneMedia\\LaravelTracer\\LaravelTracerServiceProvider"
             ]
         }
     }

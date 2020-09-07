@@ -1,6 +1,6 @@
 <?php
 
-namespace Protonemedia\LaravelTracer;
+namespace ProtoneMedia\LaravelTracer;
 
 use Illuminate\Database\Eloquent\Model;
 

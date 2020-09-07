@@ -32,7 +32,7 @@ class Kernel extends \Illuminate\Foundation\Http\Kernel
 {
     protected $routeMiddleware = [
         // ...
-        'qualify' => \Protonemedia\LaravelTracer\Middleware\QualifyRoute::class,
+        'qualify' => \ProtoneMedia\LaravelTracer\Middleware\QualifyRoute::class,
         // ...
     ];
 }
@@ -41,7 +41,7 @@ class Kernel extends \Illuminate\Foundation\Http\Kernel
 Add the `TraceUser` middleware to the routes or groups you want to trace, for example in the `web.php` routes file:
 
 ```php
-use Protonemedia\LaravelTracer\Middleware\TraceUser;
+use ProtoneMedia\LaravelTracer\Middleware\TraceUser;
 
 Route::group(['middleware' => [TraceUser::class]], function () {
     Route::get('home', 'HomeController');
@@ -63,7 +63,7 @@ Route::group(['middleware' => [TraceUser::class]], function () {
 });
 ```
 
-Now every request in this example will be logged to the `user_requests` table. You can use the `Protonemedia\LaravelTracer\UserRequest` model the retrieve the log entries.
+Now every request in this example will be logged to the `user_requests` table. You can use the `ProtoneMedia\LaravelTracer\UserRequest` model the retrieve the log entries.
 
 ### Qualify routes
 

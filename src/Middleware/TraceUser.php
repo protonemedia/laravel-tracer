@@ -1,13 +1,13 @@
 <?php
 
-namespace Protonemedia\LaravelTracer\Middleware;
+namespace ProtoneMedia\LaravelTracer\Middleware;
 
 use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Http\Request;
-use Protonemedia\LaravelTracer\QualifiedRoute;
-use Protonemedia\LaravelTracer\UserRequest;
+use ProtoneMedia\LaravelTracer\QualifiedRoute;
+use ProtoneMedia\LaravelTracer\UserRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 class TraceUser
@@ -61,9 +61,9 @@ class TraceUser
      * @param  \Illuminate\Http\Request  $request
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      *
-     * @return \Protonemedia\LaravelTracer\UserRequest|null
+     * @return \ProtoneMedia\LaravelTracer\UserRequest|null
      */
-    private function traceUserRequest(UserContract $user, Request $request, Response $response):  ? UserRequest
+    private function traceUserRequest(UserContract $user, Request $request, Response $response): ? UserRequest
     {
         $qualified = $request->qualifiedRoute();
 
@@ -85,10 +85,10 @@ class TraceUser
      * Returns a boolean wether this request has been attemped to
      * trace too many times.
      *
-     * @param  \Protonemedia\LaravelTracer\QualifiedRoute  $qualified
+     * @param  \ProtoneMedia\LaravelTracer\QualifiedRoute  $qualified
      * @return boolean
      */
-    private function tooManyAttempts(QualifiedRoute $qualified) : bool
+    private function tooManyAttempts(QualifiedRoute $qualified): bool
     {
         if (!$secondsBetweenLogs = $qualified->secondsBetweenLogs()) {
             return false;
